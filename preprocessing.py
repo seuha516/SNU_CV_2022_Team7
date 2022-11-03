@@ -1,6 +1,8 @@
 import os, shutil, json, random
 import cv2
 import numpy as np
+import tensorflow as tf
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def sample_extraction(path, num):
@@ -161,6 +163,26 @@ def main():
 
                 face_size_file.write('{} {}\n'.format(image.shape[1], image.shape[0]))
                 num += 1
+
+    # Image Resize
+    for preprocessed_path in [
+        preprocessed_train_path,
+        preprocessed_validation_path,
+        preprocessed_test_path
+    ]:
+        for emotion in emotion_eng_list:
+            image_folder_path = os.path.join(preprocessed_path, emotion)
+            for image_name in os.listdir(image_folder_path):
+                image_path = os.path.join(image_folder_path, image_name)
+
+                image = cv2.imread(image_path)
+                if 616 <= image.shape[1] <= 1016 and 837 <= image.shape[0] <= 1357:
+                    image = np.array(tf.image.resize_with_crop_or_pad(np.array(image), 1024, 1024))
+                    cv2.imwrite(image_path, image)
+                else:
+                    os.remove(image_path)
+
+
 
 
 if __name__ == '__main__':
