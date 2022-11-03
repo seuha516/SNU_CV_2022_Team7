@@ -1,6 +1,7 @@
-import os, shutil, json
-import random
-from PIL import Image
+import os, shutil, json, random
+import cv2
+import numpy as np
+
 
 def sample_extraction(path, num):
     sample_index_list = random.sample(list(range(len(os.listdir(path)))), num)
@@ -31,7 +32,14 @@ def main():
 
     # 5 facial expressions
     emotion_list = ['기쁨', '당황', '분노', '슬픔', '중립']
-
+    emotion_eng_list = ['joy', 'embarrassed', 'anger', 'sad', 'neutral']
+    emotion_eng = {
+        '기쁨': 'joy',
+        '당황': 'embarrassed',
+        '분노': 'anger',
+        '슬픔': 'sad',
+        '중립': 'neutral'
+    }
 
     # Sample Extraction
     for emotion in emotion_list:
@@ -63,12 +71,12 @@ def main():
             if cnt in sample_index_list:
                 shutil.move(
                     os.path.join(tp, image_name),
-                    os.path.join(preprocessed_validation_path, emotion, image_name)
+                    os.path.join(preprocessed_validation_path, emotion_eng[emotion], image_name)
                 )
             else:
                 shutil.move(
                     os.path.join(tp, image_name),
-                    os.path.join(preprocessed_train_path, emotion, image_name)
+                    os.path.join(preprocessed_train_path, emotion_eng[emotion], image_name)
                 )
             cnt += 1
 
@@ -80,7 +88,7 @@ def main():
             ),
             os.path.join(
                 preprocessed_train_path,
-                '{}.json'.format(emotion)
+                '{}.json'.format(emotion_eng[emotion])
             )
         )
         shutil.move(
@@ -91,7 +99,7 @@ def main():
             ),
             os.path.join(
                 preprocessed_validation_path,
-                '{}.json'.format(emotion)
+                '{}.json'.format(emotion_eng[emotion])
             )
         )
 
@@ -102,7 +110,7 @@ def main():
         for image_name in os.listdir(vp):
             shutil.move(
                 os.path.join(vp, image_name),
-                os.path.join(preprocessed_test_path, emotion, image_name)
+                os.path.join(preprocessed_test_path, emotion_eng[emotion], image_name)
             )
 
         shutil.move(
@@ -113,18 +121,19 @@ def main():
             ),
             os.path.join(
                 preprocessed_test_path,
-                '{}.json'.format(emotion)
+                '{}.json'.format(emotion_eng[emotion])
             )
         )
 
-    # Face Detection
+    # Get Face Image
     face_size_file = open('./preprocessed_data_for_cnn/face_size.txt', 'w')
     for preprocessed_path in [
         preprocessed_train_path,
         preprocessed_validation_path,
         preprocessed_test_path
     ]:
-        for emotion in emotion_list:
+        num = 0
+        for emotion in emotion_eng_list:
             with open(
                 os.path.join(
                     preprocessed_path,
@@ -135,15 +144,23 @@ def main():
 
             path = os.path.join(preprocessed_path, emotion)
             for image_name in os.listdir(path):
-                image_path = os.path.join(path, image_name)
-                image = Image.open(image_path)
+                image_path = os.path.join(path, str(num) + '.jpg')
+                os.rename(os.path.join(path, image_name), image_path)
+                image = cv2.imread(image_path)
 
                 json_item = next((item for item in json_data if item['filename'] == image_name), None)
                 face_box = json_item['annot_C']['boxes']
-                image = image.crop((face_box['minX'], face_box['minY'], face_box['maxX'], face_box['maxY']))
-                image.save(image_path)
 
-                face_size_file.write('{} {}\n'.format(image.size[0], image.size[1]))
+                minX = max(round(face_box['minX']), 0)
+                minY = max(round(face_box['minY']), 0)
+                maxX = min(round(face_box['maxX']), image.shape[1] - 1)
+                maxY = min(round(face_box['maxY']), image.shape[0] - 1)
+
+                image = image[minY:maxY, minX:maxX]
+                cv2.imwrite(image_path, image)
+
+                face_size_file.write('{} {}\n'.format(image.shape[1], image.shape[0]))
+                num += 1
 
 
 if __name__ == '__main__':
