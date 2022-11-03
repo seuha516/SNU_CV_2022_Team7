@@ -182,6 +182,21 @@ def main():
                 else:
                     os.remove(image_path)
 
+    # Image Size Reduction
+    for preprocessed_path in [
+        preprocessed_train_path,
+        preprocessed_validation_path,
+        preprocessed_test_path
+    ]:
+        for emotion in emotion_eng_list:
+            image_folder_path = os.path.join(preprocessed_path, emotion)
+            for image_name in os.listdir(image_folder_path):
+                image_path = os.path.join(image_folder_path, image_name)
+
+                image = cv2.imread(image_path)
+                image = cv2.resize(image, dsize=(128, 128), interpolation=cv2.INTER_CUBIC)
+                cv2.imwrite(image_path, image)
+
 
 
 
