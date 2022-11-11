@@ -1,3 +1,7 @@
 .idea
+.DS_Store
+*.pyc
+__pycache__/
+
 data_for_cnn
 preprocessed_data_for_cnn
