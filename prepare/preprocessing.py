@@ -1,9 +1,35 @@
-import os, shutil, json, random
+import os
+import json
+import shutil
+import random
 import cv2
-import numpy as np
-import tensorflow as tf
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+train_path = 'data_for_cnn/Training'
+train_label_folder_format = '[라벨]EMOIMG_{}_TRAIN'
+train_label_file_format = 'img_emotion_training_data({}).json'
+train_image_folder_format = '[원천]EMOIMG_{}_TRAIN_01'
+
+# for test. 2000 * 5
+validation_path = 'data_for_cnn/Validation'
+validation_label_folder_format = '[라벨]EMOIMG_{}_VALID'
+validation_label_file_format = 'img_emotion_validation_data({}).json'
+validation_image_folder_format = '[원천]EMOIMG_{}_VALID'
+
+# preprocessed data
+preprocessed_train_path = 'preprocessed_data_for_cnn/train'
+preprocessed_validation_path = 'preprocessed_data_for_cnn/validation'
+preprocessed_test_path = 'preprocessed_data_for_cnn/test'
+
+# 5 facial expressions
+emotion_list = ['기쁨', '당황', '분노', '슬픔', '중립']
+emotion_eng_list = ['joy', 'embarrassed', 'anger', 'sad', 'neutral']
+emotion_eng = {
+    '기쁨': 'joy',
+    '당황': 'embarrassed',
+    '분노': 'anger',
+    '슬픔': 'sad',
+    '중립': 'neutral'
+}
 
 def sample_extraction(path, num):
     sample_index_list = random.sample(list(range(len(os.listdir(path)))), num)
@@ -13,37 +39,18 @@ def sample_extraction(path, num):
             os.remove(os.path.join(path, image_name))
         cnt += 1
 
-
 def main():
-    # for train & validation. (12000 + 3000) * 5
-    train_path = './data_for_cnn/Training'
-    train_label_folder_format = '[라벨]EMOIMG_{}_TRAIN'
-    train_label_file_format = 'img_emotion_training_data({}).json'
-    train_image_folder_format = '[원천]EMOIMG_{}_TRAIN_01'
+    # Make result folders
+    for result_path in [
+        preprocessed_train_path,
+        preprocessed_validation_path,
+        preprocessed_test_path
+    ]:
+        os.makedirs(result_path, exist_ok=True)
+        for emotion in emotion_eng_list:
+            os.makedirs(os.path.join(result_path, emotion), exist_ok=True)
 
-    # for test. 2000 * 5
-    validation_path = './data_for_cnn/Validation'
-    validation_label_folder_format = '[라벨]EMOIMG_{}_VALID'
-    validation_label_file_format = 'img_emotion_validation_data({}).json'
-    validation_image_folder_format = '[원천]EMOIMG_{}_VALID'
-
-    # preprocessed data
-    preprocessed_train_path = './preprocessed_data_for_cnn/train'
-    preprocessed_validation_path = './preprocessed_data_for_cnn/validation'
-    preprocessed_test_path = './preprocessed_data_for_cnn/test'
-
-    # 5 facial expressions
-    emotion_list = ['기쁨', '당황', '분노', '슬픔', '중립']
-    emotion_eng_list = ['joy', 'embarrassed', 'anger', 'sad', 'neutral']
-    emotion_eng = {
-        '기쁨': 'joy',
-        '당황': 'embarrassed',
-        '분노': 'anger',
-        '슬픔': 'sad',
-        '중립': 'neutral'
-    }
-
-    # Sample Extraction
+    # Sample extraction
     for emotion in emotion_list:
         sample_extraction(
             os.path.join(
@@ -60,7 +67,7 @@ def main():
             2000
         )
 
-    # Data Arrange
+    # Data arrange
     for emotion in emotion_list:
         sample_index_list = random.sample(list(range(15000)), 3000)
         tp = os.path.join(
@@ -127,14 +134,14 @@ def main():
             )
         )
 
-    # Get Face Image
-    face_size_file = open('./preprocessed_data_for_cnn/face_size.txt', 'w')
+    # Get face image
     for preprocessed_path in [
         preprocessed_train_path,
         preprocessed_validation_path,
         preprocessed_test_path
     ]:
         num = 0
+
         for emotion in emotion_eng_list:
             with open(
                 os.path.join(
@@ -148,7 +155,7 @@ def main():
             for image_name in os.listdir(path):
                 image_path = os.path.join(path, str(num) + '.jpg')
                 os.rename(os.path.join(path, image_name), image_path)
-                image = cv2.imread(image_path)
+                image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
                 json_item = next((item for item in json_data if item['filename'] == image_name), None)
                 face_box = json_item['annot_C']['boxes']
@@ -161,10 +168,9 @@ def main():
                 image = image[minY:maxY, minX:maxX]
                 cv2.imwrite(image_path, image)
 
-                face_size_file.write('{} {}\n'.format(image.shape[1], image.shape[0]))
                 num += 1
 
-    # Image Resize
+    # Add padding
     for preprocessed_path in [
         preprocessed_train_path,
         preprocessed_validation_path,
@@ -174,15 +180,23 @@ def main():
             image_folder_path = os.path.join(preprocessed_path, emotion)
             for image_name in os.listdir(image_folder_path):
                 image_path = os.path.join(image_folder_path, image_name)
+                image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+                h, w = image.shape
 
-                image = cv2.imread(image_path)
-                if 616 <= image.shape[1] <= 1016 and 837 <= image.shape[0] <= 1357:
-                    image = np.array(tf.image.resize_with_crop_or_pad(np.array(image), 1024, 1024))
-                    cv2.imwrite(image_path, image)
+                if h == w:
+                    pass
                 else:
-                    os.remove(image_path)
+                    if h > w:
+                        image = cv2.copyMakeBorder(
+                            image, 0, 0, (h - w) // 2, (h - w) // 2, cv2.BORDER_CONSTANT, (0, 0, 0)
+                        )
+                    else:
+                        image = cv2.copyMakeBorder(
+                            image, (w - h) // 2, (w - h) // 2, 0, 0, cv2.BORDER_CONSTANT, (0, 0, 0)
+                        )
+                    cv2.imwrite(image_path, image)
 
-    # Image Size Reduction
+    # Image resize
     for preprocessed_path in [
         preprocessed_train_path,
         preprocessed_validation_path,
@@ -194,10 +208,8 @@ def main():
                 image_path = os.path.join(image_folder_path, image_name)
 
                 image = cv2.imread(image_path)
-                image = cv2.resize(image, dsize=(128, 128), interpolation=cv2.INTER_CUBIC)
+                image = cv2.resize(image, dsize=(256, 256), interpolation=cv2.INTER_CUBIC)
                 cv2.imwrite(image_path, image)
-
-
 
 
 if __name__ == '__main__':
