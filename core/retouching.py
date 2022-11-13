@@ -1,11 +1,9 @@
-import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
 
 
 def retouching(img=None, h=5, hColor=5, shape=None):
     dst = cv.fastNlMeansDenoisingColored(img, None, h, hColor, 7, 21)
-    cv.imwrite('result/retouched_output.jpg', dst)
 
     b, g, r = cv.split(img)
     img_show = cv.merge([r, g, b])
