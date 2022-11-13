@@ -4,21 +4,21 @@ import shutil
 import random
 import cv2
 
-train_path = 'data_for_cnn/Training'
+train_path = '../data_for_cnn/Training'
 train_label_folder_format = '[라벨]EMOIMG_{}_TRAIN'
 train_label_file_format = 'img_emotion_training_data({}).json'
 train_image_folder_format = '[원천]EMOIMG_{}_TRAIN_01'
 
 # for test. 2000 * 5
-validation_path = 'data_for_cnn/Validation'
+validation_path = '../data_for_cnn/Validation'
 validation_label_folder_format = '[라벨]EMOIMG_{}_VALID'
 validation_label_file_format = 'img_emotion_validation_data({}).json'
 validation_image_folder_format = '[원천]EMOIMG_{}_VALID'
 
 # preprocessed data
-preprocessed_train_path = 'preprocessed_data_for_cnn/train'
-preprocessed_validation_path = 'preprocessed_data_for_cnn/validation'
-preprocessed_test_path = 'preprocessed_data_for_cnn/test'
+preprocessed_train_path = '../preprocessed_data_for_cnn/train'
+preprocessed_validation_path = '../preprocessed_data_for_cnn/validation'
+preprocessed_test_path = '../preprocessed_data_for_cnn/test'
 
 # 5 facial expressions
 emotion_list = ['기쁨', '당황', '분노', '슬픔', '중립']
@@ -188,11 +188,11 @@ def main():
                 else:
                     if h > w:
                         image = cv2.copyMakeBorder(
-                            image, 0, 0, (h - w) // 2, (h - w) // 2, cv2.BORDER_CONSTANT, (0, 0, 0)
+                            image, 0, 0, (h - w) // 2, (h - w) // 2, cv2.BORDER_REPLICATE, (0, 0, 0)
                         )
                     else:
                         image = cv2.copyMakeBorder(
-                            image, (w - h) // 2, (w - h) // 2, 0, 0, cv2.BORDER_CONSTANT, (0, 0, 0)
+                            image, (w - h) // 2, (w - h) // 2, 0, 0, cv2.BORDER_REPLICATE, (0, 0, 0)
                         )
                     cv2.imwrite(image_path, image)
 
@@ -208,7 +208,7 @@ def main():
                 image_path = os.path.join(image_folder_path, image_name)
 
                 image = cv2.imread(image_path)
-                image = cv2.resize(image, dsize=(256, 256), interpolation=cv2.INTER_CUBIC)
+                image = cv2.resize(image, dsize=(128, 128), interpolation=cv2.INTER_CUBIC)
                 cv2.imwrite(image_path, image)
 
 
