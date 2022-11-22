@@ -38,24 +38,6 @@ def retouching(img=None, h=5, hColor=5, shape=None):
 
     cv.imwrite('result/mask.jpg', mask)
 
-    # l_eye_upper = min(shape.part(37).y, shape.part(38).y)
-    # l_eye_lower = max(shape.part(40).y, shape.part(41).y)
-    # l_eye_left = shape.part(36).x
-    # l_eye_right = shape.part(39).x
-    # mask[l_eye_upper:l_eye_lower, l_eye_left:l_eye_right, :] = 1
-
-    # r_eye_upper = min(shape.part(43).y, shape.part(44).y)
-    # r_eye_lower = max(shape.part(46).y, shape.part(47).y)
-    # r_eye_left = shape.part(42).x
-    # r_eye_right = shape.part(45).x
-    # mask[r_eye_upper:r_eye_lower, r_eye_left:r_eye_right, :] = 1.
-
-    # mouth_upper = min(shape.part(50).y, shape.part(52).y)
-    # mouth_lower = max(shape.part(56).y, shape.part(58).y)
-    # mouth_left = shape.part(48).x
-    # mouth_right = shape.part(54).x
-    # mask[mouth_upper:mouth_lower, mouth_left:mouth_right, :] = 1.
-
     dst = img*mask + dst*(1-mask)
     cv.imwrite('result/retouched_w_mask.jpg', dst)
 
