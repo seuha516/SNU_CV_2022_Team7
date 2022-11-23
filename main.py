@@ -4,10 +4,12 @@ import argparse
 from core.detecting import detecting
 from core.classifying import classifying
 from core.retouching import retouching
+from core.remove_background import remove_background
 
 
 def main(args):
     image = cv2.imread(args.image)
+    background = cv2.imread(args.background)
 
     ### Face detecting ###
     face, shape = detecting(img=image)
@@ -18,6 +20,9 @@ def main(args):
 
     cv2.imwrite(os.path.join(args.result_dir, 'retouched_output.png'), retouched_output)
 
+    ### Remove background ###
+    background_filled = remove_background(image=retouched_output, background=background)
+    cv2.imwrite(os.path.join(args.result_dir, 'bg_filled_output.png'), background_filled)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

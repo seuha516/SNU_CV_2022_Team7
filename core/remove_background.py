@@ -72,6 +72,8 @@ def pyramid_blending(image : np.ndarray, background: np.ndarray, mask: np.ndarra
 
     return blended
 
+
+## to be independently executed
 def main():
     image_path = sys.argv[1]
     background_path = sys.argv[2] if len(sys.argv) > 2 else None
@@ -92,6 +94,18 @@ def main():
         result = pyramid_blending(image, background, mask, pyr_levels)
 
         cv2.imwrite(RESULT_DIR + f"background_filled_pyramid_{pyr_levels}.png", result)
+
+
+## to be imported in main.py
+def remove_background(image : np.ndarray, background : np.ndarray) -> np.ndarray:
+    # remove background
+    bg_removed = remove(image, alpha_matting=True, alpha_matting_foreground_threshold=250, alpha_matting_background_threshold=60 ,alpha_matting_erode_size=10)
+    # fill background with naive interpolation
+    mask = remove(image, only_mask=True)
+    bg_filled = naive_interpolation(bg_removed, background, mask)
+    print("Successfully removed background and filled it with the given background image.")
+    return bg_filled
+
 
 if __name__ == '__main__':
     main()
