@@ -2,9 +2,9 @@ import os
 import cv2
 import argparse
 from core.detecting import detecting
-# from core.classifying import classifying
+from core.classifying import classifying
 from core.retouching import retouching
-# from core.remove_background import remove_background
+from core.remove_background import remove_background
 
 
 def main(args):
@@ -15,17 +15,17 @@ def main(args):
     face, shape = detecting(img=image)
 
     ### Facial expression classifying ###
-    # classifying(img=face)
+    classifying(img=face)
 
     ### Retouching ###
     retouched_output = retouching(
         img=image, h=args.h, hColor=args.hColor, shape=shape)
 
     ### Remove background ###
-    # background_filled = remove_background(
-    #     image=retouched_output, background=background)
-    # cv2.imwrite(os.path.join(args.result_dir,
-    #             'bg_filled_output.png'), background_filled)
+    background_filled = remove_background(
+        image=retouched_output, background=background)
+    cv2.imwrite(os.path.join(args.result_dir,
+                'bg_filled_output.png'), background_filled)
 
 
 if __name__ == '__main__':
