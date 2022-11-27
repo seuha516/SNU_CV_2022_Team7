@@ -13,16 +13,20 @@ def main(args):
 
     ### Face detecting ###
     face, shape = detecting(img=image)
+
     ### Facial expression classifying ###
     classifying(img=face)
-    ### Retouching ###
-    retouched_output = retouching(img=image, h=args.h, shape=shape)
 
-    cv2.imwrite(os.path.join(args.result_dir, 'retouched_output.png'), retouched_output)
+    ### Retouching ###
+    retouched_output = retouching(
+        img=image, h=args.h, hColor=args.hColor, shape=shape)
 
     ### Remove background ###
-    background_filled = remove_background(image=retouched_output, background=background)
-    cv2.imwrite(os.path.join(args.result_dir, 'bg_filled_output.png'), background_filled)
+    background_filled = remove_background(
+        image=retouched_output, background=background)
+    cv2.imwrite(os.path.join(args.result_dir,
+                'bg_filled_output.png'), background_filled)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -32,9 +36,9 @@ if __name__ == '__main__':
                         help='background file')
     parser.add_argument('--result_dir', type=str, default='result',
                         help='result directory')
-    parser.add_argument('--h', type=int, default=5,
+    parser.add_argument('--h', type=int, default=10,
                         help='filter strength')
-    parser.add_argument('--hColor', type=int, default=5,
+    parser.add_argument('--hColor', type=int, default=10,
                         help='filter strength for color components')
     args = parser.parse_args()
     main(args)
