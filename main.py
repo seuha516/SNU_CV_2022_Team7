@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--image', type=str, default='data/1.jpg',
                         help='image file')
-    parser.add_argument('--background', type=str, default='data/background.jpg',
+    parser.add_argument('--background', type=str, default='data/sea.jpeg',
                         help='background file')
     parser.add_argument('--result_dir', type=str, default='result',
                         help='result directory')
