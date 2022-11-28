@@ -5,6 +5,7 @@ from core.detecting import detecting
 from core.classifying import classifying
 from core.retouching import retouching
 from core.remove_background import remove_background
+from core.filter import filter
 
 
 def main(args):
@@ -27,6 +28,11 @@ def main(args):
     cv2.imwrite(os.path.join(args.result_dir,
                 'bg_filled_output.png'), background_filled)
 
+    ### Filter ###
+    filter_applied = filter(image=background_filled, filter_type=args.filter)
+    cv2.imwrite(os.path.join(args.result_dir, f'{args.filter}.png'), filter_applied)
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -40,5 +46,6 @@ if __name__ == '__main__':
                         help='filter strength')
     parser.add_argument('--hColor', type=int, default=10,
                         help='filter strength for color components')
+    parser.add_argument('--filter', type=str, default='sepia')
     args = parser.parse_args()
     main(args)
