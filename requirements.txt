@@ -47,6 +47,10 @@ multidict==6.0.2
 networkx==2.8.8
 numba==0.56.4
 numpy==1.21.6
+nvidia-cublas-cu11==11.10.3.66
+nvidia-cuda-nvrtc-cu11==11.7.99
+nvidia-cuda-runtime-cu11==11.7.99
+nvidia-cudnn-cu11==8.5.0.96
 oauthlib==3.2.0
 onnxruntime==1.12.1
 opencv-python==4.6.0.66
@@ -83,6 +87,8 @@ tensorflow-estimator==2.10.0
 tensorflow-io-gcs-filesystem==0.26.0
 termcolor==1.1.0
 tifffile==2022.10.10
+torch==1.13.0
+torchvision==0.14.0
 tqdm==4.64.0
 typing-extensions==4.3.0
 urllib3==1.26.12
