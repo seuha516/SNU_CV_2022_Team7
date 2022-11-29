@@ -10,6 +10,8 @@ RESULT_DIR = "result/filter/"
 
 def filter(image : np.ndarray, filter_type : str) -> np.ndarray:
     image = np.array(Image.fromarray(image.astype(np.uint8)))
+    if image.shape[2] == 4:
+        image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
 
     if filter_type == "summer":
         return summer_filter(image)
