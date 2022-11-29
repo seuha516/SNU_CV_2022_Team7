@@ -5,3 +5,4 @@ __pycache__/
 
 data_for_cnn
 preprocessed_data_for_cnn
+onnx
