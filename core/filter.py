@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import cv2
+from PIL import Image
 from scipy.interpolate import UnivariateSpline
 
 RESULT_DIR = "result/filter/"
