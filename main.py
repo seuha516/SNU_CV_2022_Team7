@@ -9,43 +9,55 @@ from core.filter import filter
 
 
 def main(args):
+    os.makedirs(args.result_dir, exist_ok=True)
+
     image = cv2.imread(args.image)
     background = cv2.imread(args.background)
 
     ### Face detecting ###
-    face, shape = detecting(img=image)
+    print('Step 1 : Face detecting...')
+    face, shape = detecting(image=image)
+    print('Step 1 : Complete')
 
     ### Facial expression classifying ###
-    classifying(img=face)
+    print('Step 2 : Facial expression classifying...')
+    result = classifying(image=face)
+    with open(os.path.join(args.result_dir, 'facial_expression_classifying.txt'), 'w') as f:
+        f.write(result)
+    print('Step 2 : Complete')
 
     ### Retouching ###
-    retouched_output = retouching(
-        img=image, h=args.h, hColor=args.hColor, shape=shape)
+    print('Step 3 : Retouching...')
+    image = retouching(image=image, h=args.h, hColor=args.hColor, shape=shape)
+    print('Step 3 : Complete')
 
     ### Remove background ###
-    background_filled = remove_background(
-        image=retouched_output, background=background)
-    cv2.imwrite(os.path.join(args.result_dir,
-                'bg_filled_output.png'), background_filled)
+    print('Step 4 : Remove background...')
+    image = remove_background(image=image, background=background)
+    print('Step 4 : Complete')
 
     ### Filter ###
-    filter_applied = filter(image=background_filled, filter_type=args.filter)
-    cv2.imwrite(os.path.join(args.result_dir, f'{args.filter}.png'), filter_applied)
-
+    print('Step 5 : Filter...')
+    for filter_type in [None, 'summer', 'winter', 'bright', 'sepia', 'sunset']:
+        result = filter(image=image, filter_type=filter_type)
+        cv2.imwrite(os.path.join(
+            args.result_dir,
+            f'{"original" if filter_type is None else filter_type}.png'
+        ), result)
+    print('Step 5 : Complete')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image', type=str, default='data/1.jpg',
+    parser.add_argument('--image', type=str, default='data/default_selfie.jpg',
                         help='image file')
-    parser.add_argument('--background', type=str, default='data/sea.jpeg',
+    parser.add_argument('--background', type=str, default=None,
                         help='background file')
     parser.add_argument('--result_dir', type=str, default='result',
                         help='result directory')
     parser.add_argument('--h', type=int, default=10,
-                        help='filter strength')
+                        help='reouching filter strength')
     parser.add_argument('--hColor', type=int, default=10,
-                        help='filter strength for color components')
-    parser.add_argument('--filter', type=str, default='sepia')
+                        help='reouching filter strength for color components')
     args = parser.parse_args()
     main(args)

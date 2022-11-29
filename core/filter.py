@@ -1,32 +1,32 @@
-import cv2
 import sys
+import os
 import numpy as np
+import cv2
 from scipy.interpolate import UnivariateSpline
 
-from filter_base import *
-
-RESULT_DIR = "./result/filters/"
+RESULT_DIR = "result/filter/"
 
 
-def filter(image : np.ndarray, type : str) -> np.ndarray:
-    if type == "summer":
+def filter(image : np.ndarray, filter_type : str) -> np.ndarray:
+    image = np.array(Image.fromarray(image.astype(np.uint8)))
+
+    if filter_type == "summer":
         return summer_filter(image)
-    elif type == "winter":
+    elif filter_type == "winter":
         return winter_filter(image)
-    elif type == "bright":
+    elif filter_type == "bright":
         return bright_filter(image)
-    elif type == "sepia":
+    elif filter_type == "sepia":
         return sepia_filter(image)
-    elif type == "sunset":
+    elif filter_type == "sunset":
         return sunset_filter(image)
     else:
         return image
 
-
 def summer_filter(img):
     increaseLookupTable = _LookupTable([0, 64, 128, 256], [0, 80, 160, 256])
     decreaseLookupTable = _LookupTable([0, 64, 128, 256], [0, 50, 100, 256])
-    blue_channel, green_channel,red_channel  = cv2.split(img)
+    blue_channel, green_channel, red_channel  = cv2.split(img)
     red_channel = cv2.LUT(red_channel, increaseLookupTable).astype(np.uint8)
     blue_channel = cv2.LUT(blue_channel, decreaseLookupTable).astype(np.uint8)
     summer = cv2.merge((blue_channel, green_channel, red_channel ))
@@ -72,13 +72,19 @@ def _LookupTable(x, y):
 
 
 def main():
-    image_path = sys.argv[1]
-    filter_type = sys.argv[2]
-    image = cv2.imread(image_path)
+    os.makedirs(RESULT_DIR, exist_ok=True)
 
-    # apply filter
-    result = filter(image, filter_type)
-    cv2.imwrite(RESULT_DIR + f"{filter_type}.png", result)
+    image = cv2.imread(sys.argv[1])
+    for filter_type in [None, 'summer', 'winter', 'bright', 'sepia', 'sunset']:
+        result = filter(image=image, filter_type=filter_type)
+        cv2.imwrite(os.path.join(
+            RESULT_DIR,
+            f'{"original" if filter_type is None else filter_type}.png'
+        ), result)
+
 
 if __name__ == "__main__":
+    from filter_base import *
     main()
+else:
+    from core.filter_base import *
