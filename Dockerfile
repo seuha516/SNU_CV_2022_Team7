@@ -1,6 +1,5 @@
 FROM tensorflow/tensorflow:latest
 WORKDIR /app
-COPY . /app
 
 RUN apt-get update
 RUN apt-get install build-essential cmake libgl1-mesa-glx libglib2.0-0 -y
