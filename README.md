@@ -3,6 +3,7 @@ SNU CV 2022, Team 7
 
 ## How to run
 ### Set environment (using Docker)
+_**NOTE**: We have set Dockerfile so that the code can work in all environments, but tensorflow may not work in some OS. (ex. Mac M1)_
 ```
 docker build -t gyps .
 docker run --rm -it -v ${PWD}:/home -w /home gyps /bin/bash
