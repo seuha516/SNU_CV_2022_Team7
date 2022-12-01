@@ -5,8 +5,8 @@ from tensorflow import keras
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 IMAGE_SIZE = 128
-model_path = 'best-cnn-model.h5'
-test_path = 'preprocessed_data_for_cnn/test'
+model_path = '../best-cnn-model.h5'
+test_path = '../preprocessed_data_for_cnn/test'
 emotion_list = ['joy', 'embarrassed', 'anger', 'sad', 'neutral']
 
 test_images = []
