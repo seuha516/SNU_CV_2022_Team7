@@ -3,7 +3,11 @@ SNU CV 2022, Team 7
 
 ## How to run
 ### Set environment (using Docker)
-_**NOTE**: We have set Dockerfile so that the code can work in all environments, but tensorflow may not work in some OS. (ex. Mac M1)_
+_**NOTE 1**: We have set Dockerfile so that the code can work in all environments, but tensorflow may not work in some OS. (ex. Mac M1)_  
+_**NOTE 2**: This repository uses git LFS because of its high-capacity files. If the file below could not be cloned due to the usage limit of git LFS, it should be added directly by the following method._  
+**best-cnn-model.h5** : https://drive.google.com/file/d/1kSQ55StLWqfl1_dJzWRuQKrZHpml4csS/view?usp=share_link  
+**u2net.onxx** : https://github.com/danielgatis/rembg#models
+
 ```
 docker build -t gyps .
 docker run --rm -it -v ${PWD}:/home -w /home gyps /bin/bash
