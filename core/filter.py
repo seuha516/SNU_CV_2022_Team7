@@ -49,7 +49,6 @@ def sunset_filter(img):
     blue_channel, green_channel,red_channel = cv2.split(img)
     red_channel = cv2.LUT(red_channel, increaseLookupTable).astype(np.uint8)
     green_channel = cv2.LUT(green_channel, increaseLookupTable).astype(np.uint8)
-    green_channel = cv2.LUT(green_channel, increaseLookupTable).astype(np.uint8)
     sunset = cv2.merge((blue_channel, green_channel, red_channel))
     sunset = brightness(sunset, .9)
     return sunset
