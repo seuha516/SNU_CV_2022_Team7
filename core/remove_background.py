@@ -5,7 +5,7 @@ import cv2
 from PIL import Image
 from rembg import remove
 
-BACKGROUND_DEFAULT = "data/default_background.jpg"
+BACKGROUND_DEFAULT = "data/b1.jpg"
 RESULT_DIR = "result/remove_background/"
 
 
